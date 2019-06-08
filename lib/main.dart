@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:location/location.dart' as geoloc;
 
 import 'package:camera/camera.dart';
@@ -38,6 +39,15 @@ class _SOSClickAppState extends State<SOSClickApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      localizationsDelegates: [
+        // ... app-specific localization delegate[s] here
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: [
+        const Locale('en'), // English
+        const Locale('ru'), // Russian
+      ],
       title: 'SOS Click',
       theme: ThemeData(
           primarySwatch: Colors.deepOrange, accentColor: Colors.redAccent),
