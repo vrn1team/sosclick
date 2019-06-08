@@ -1,8 +1,33 @@
+import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:location/location.dart' as geoloc;
 
-void main() => runApp(SOSClickApp());
+import 'package:camera/camera.dart';
+import 'package:path/path.dart' show join;
+import 'package:path_provider/path_provider.dart';
+import './screens/DisplayPictureScreen.dart';
+
+Future<void> main() async {
+  // Obtain a list of the available cameras on the device.
+  final cameras = await availableCameras();
+
+  // Get a specific camera from the list of available cameras
+  final firstCamera = cameras.first;
+
+  runApp(SOSClickApp(
+    camera: firstCamera,
+  ));
+}
 
 class SOSClickApp extends StatefulWidget {
+  final CameraDescription camera;
+
+  SOSClickApp({
+    Key key,
+    @required this.camera,
+  }) : super(key: key);
+
   @override
   State<StatefulWidget> createState() {
     return _SOSClickAppState();
@@ -16,25 +41,60 @@ class _SOSClickAppState extends State<SOSClickApp> {
       title: 'SOS Click',
       theme: ThemeData(
           primarySwatch: Colors.deepOrange, accentColor: Colors.redAccent),
-      home: SOSHomePage(title: 'SOS click home page'),
+      home: SOSHomePage(camera: widget.camera, title: 'SOS click home page'),
     );
   }
 }
 
 class SOSHomePage extends StatefulWidget {
-  SOSHomePage({Key key, this.title}) : super(key: key);
-
   final String title;
+  final CameraDescription camera;
+
+  SOSHomePage({
+    Key key,
+    @required this.title,
+    @required this.camera,
+  }) : super(key: key);
 
   @override
   _SOSHomePageState createState() => _SOSHomePageState();
 }
 
 class _SOSHomePageState extends State<SOSHomePage> {
+  CameraController _controller;
+  Future<void> _initializeControllerFuture;
   int _counter = 0;
   bool _visible = false;
+  String _locationInfo = '';
 
-  void _callEmergency() {}
+  @override
+  void initState() {
+    super.initState();
+    // In order to display the current output from the Camera, you need to
+    // create a CameraController.
+    _controller = CameraController(
+      // Get a specific camera from the list of available cameras
+      widget.camera,
+      // Define the resolution to use
+      ResolutionPreset.medium,
+    );
+
+    // Next, you need to initialize the controller. This returns a Future
+    _initializeControllerFuture = _controller.initialize();
+  }
+
+  @override
+  void dispose() {
+    // Make sure to dispose of the controller when the Widget is disposed
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _callEmergency() {
+    _getUserLocation();
+    _takePhoto();
+    _visible = true;
+  }
 
   void _incrementCounter() {
     setState(() {
@@ -46,10 +106,73 @@ class _SOSHomePageState extends State<SOSHomePage> {
       if (_counter < 3) {
         _counter++;
       } else {
-        _visible = true;
         _callEmergency();
       }
     });
+  }
+
+  void _takePhoto() async {
+    // Take the Picture in a try / catch block. If anything goes wrong,
+    // catch the error.
+    try {
+      // Ensure the camera is initialized
+      await _initializeControllerFuture;
+
+      // Construct the path where the image should be saved using the path
+      // package.
+      final path = join(
+        // In this example, store the picture in the temp directory. Find
+        // the temp directory using the `path_provider` plugin.
+        (await getTemporaryDirectory()).path,
+        '${DateTime.now()}.png',
+      );
+
+      // Attempt to take a picture and log where it's been saved
+      await _controller.takePicture(path);
+
+      // If the picture was taken, display it on a new screen
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DisplayPictureScreen(imagePath: path),
+        ),
+      );
+    } catch (e) {
+      // If an error occurs, log the error to the console.
+      print(e);
+    }
+  }
+
+  void _getUserLocation() async {
+    final location = geoloc.Location();
+    try {
+      final currentLocation = await location.getLocation();
+      setState(() {
+        _locationInfo = '' +
+            currentLocation.latitude.toString() +
+            ' ' +
+            currentLocation.longitude.toString() +
+            ' ' +
+            currentLocation.altitude.toString();
+      });
+    } catch (error) {
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Could not fetch Location'),
+              content: Text('Please add an address manually.'),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('Ok'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                )
+              ],
+            );
+          });
+    }
   }
 
   @override
@@ -83,9 +206,17 @@ class _SOSHomePageState extends State<SOSHomePage> {
               style: Theme.of(context).textTheme.display1,
             ),
             Visibility(
-              child: Text(
-                'Calling the emergency ...',
-                style: Theme.of(context).textTheme.display1,
+              child: Column(
+                children: <Widget>[
+                  Text(_locationInfo),
+                  SizedBox(
+                    height: 8.0,
+                  ),
+                  Text(
+                    'Calling the emergency ...',
+                    style: Theme.of(context).textTheme.display1,
+                  ),
+                ],
               ),
               visible: _visible,
             ),
