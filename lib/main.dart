@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(SOSClickApp());
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class SOSClickApp extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _SOSClickAppState();
+  }
+}
+
+class _SOSClickAppState extends State<SOSClickApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'SOS Click',
-      theme: ThemeData(      
-        primarySwatch: Colors.blue,
-      ),
+      theme: ThemeData(
+          primarySwatch: Colors.deepOrange, accentColor: Colors.redAccent),
       home: SOSHomePage(title: 'SOS click home page'),
     );
   }
@@ -19,7 +24,6 @@ class MyApp extends StatelessWidget {
 class SOSHomePage extends StatefulWidget {
   SOSHomePage({Key key, this.title}) : super(key: key);
 
- 
   final String title;
 
   @override
@@ -28,6 +32,9 @@ class SOSHomePage extends StatefulWidget {
 
 class _SOSHomePageState extends State<SOSHomePage> {
   int _counter = 0;
+  bool _visible = false;
+
+  void _callEmergency() {}
 
   void _incrementCounter() {
     setState(() {
@@ -36,7 +43,12 @@ class _SOSHomePageState extends State<SOSHomePage> {
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
-      _counter++;
+      if (_counter < 3) {
+        _counter++;
+      } else {
+        _visible = true;
+        _callEmergency();
+      }
     });
   }
 
@@ -57,24 +69,29 @@ class _SOSHomePageState extends State<SOSHomePage> {
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        child: Column(        
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
+            Center(
+              child: FlatButton(
+                onPressed: _incrementCounter,
+                child: Icon(Icons.add),
+              ),
             ),
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.display1,
             ),
+            Visibility(
+              child: Text(
+                'Calling the emergency ...',
+                style: Theme.of(context).textTheme.display1,
+              ),
+              visible: _visible,
+            ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
