@@ -8,6 +8,7 @@ import 'package:camera/camera.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
 import '../screens/DisplayPictureScreen.dart';
+import '../screens/help.dart';
 import '../ui_elements/clean_registration_tile.dart';
 
 class SOSPage extends StatefulWidget {
@@ -63,7 +64,14 @@ class _SOSPageState extends State<SOSPage> {
     _takePhoto();
     _sendSMS();
 
-    _visible = true;
+    //_visible = true;
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HelpScreen(info: _userInfo + ' ' + _locationInfo),
+      ),
+    );
   }
 
   void _incrementCounter() {
@@ -103,12 +111,12 @@ class _SOSPageState extends State<SOSPage> {
       await _controller.takePicture(path);
 
       // If the picture was taken, display it on a new screen
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => DisplayPictureScreen(imagePath: path),
-        ),
-      );
+      // Navigator.push(
+      //   context,
+      //   MaterialPageRoute(
+      //     builder: (context) => DisplayPictureScreen(imagePath: path),
+      //   ),
+      // );
     } catch (e) {
       // If an error occurs, log the error to the console.
       print(e);
