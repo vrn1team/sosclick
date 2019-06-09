@@ -58,6 +58,18 @@ class UsersDbProvider implements Source, Cache {
     return null;
   }
 
+  Future<List<User>> fetchUsers() async {
+    final maps = await db.query("Users", columns: null);
+
+    if (maps.length > 0) {
+      return maps
+          .map((Map<String, dynamic> usermap) => User.fromDb(usermap))
+          .toList();
+    }
+
+    return null;
+  }
+
   Future<int> addUser(User user) {
     return db.insert(
       "Users",

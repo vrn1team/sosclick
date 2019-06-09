@@ -44,6 +44,18 @@ class Repository {
     return user;
   }
 
+  Future<List<User>> fetchUsersFromCache() async {
+    List<User> users;
+
+    for (var cache in caches) {
+      users = await cache.fetchUsers();
+      if (users != null) {
+        break;
+      }
+    }
+    return users;
+  }
+
   clearCache() async {
     for (var cache in caches) {
       await cache.clearUsers();
@@ -64,6 +76,7 @@ abstract class Source {
 
 abstract class Cache {
   Future<CurrentUser> fetchCurrentUser(String hash);
+  Future<List<User>> fetchUsers();
   Future<int> addUser(User user);
   Future<int> addCurrentUser(CurrentUser currentuser);
   Future<int> clearUsers();

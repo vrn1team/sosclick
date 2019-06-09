@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../models/user.dart';
-import 'package:scoped_model/scoped_model.dart';
-import 'package:sosclick/scoped-models/mainmodel.dart';
+
 import '../ui_elements/adaptive_progress_indicator.dart';
 
 class AuthPage extends StatefulWidget {

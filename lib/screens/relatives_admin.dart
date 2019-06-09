@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 
 import './relative_edit.dart';
 import './relatives_list.dart';
-import '../scoped-models/mainmodel.dart';
+import '../resources/repository.dart';
 import '../ui_elements/clean_registration_tile.dart';
 
 import 'dart:async';
 
 class RelativesAdminPage extends StatelessWidget {
-  final MainModel model;
   final String title = "Контакты";
 
-  RelativesAdminPage(this.model);
+  RelativesAdminPage();
 
   Widget _buildSideDrawer(BuildContext context) {
     return Drawer(
@@ -65,8 +64,8 @@ class RelativesAdminPage extends StatelessWidget {
                 body: TabBarView(
                   children: <Widget>[
                     //these pages are embedded!!! return only body!!!
-                    RelativeEditPage(),
-                    RelativesListPage(model)
+                    RelativeEditPage(0),
+                    RelativesListPage()
                   ],
                 ))));
   }

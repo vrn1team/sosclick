@@ -4,16 +4,24 @@ import 'package:scoped_model/scoped_model.dart';
 import '../helpers/ensure-visible.dart';
 import '../models/user.dart';
 import '../scoped-models/mainmodel.dart';
+import '../resources/repository.dart';
 import '../ui_elements/adaptive_progress_indicator.dart';
 
 class RelativeEditPage extends StatefulWidget {
+  int selectedRelativeIndex;
+
+  RelativeEditPage(this.selectedRelativeIndex);
   @override
   State<StatefulWidget> createState() {
-    return _RelativeEditPageState();
+    return _RelativeEditPageState(selectedRelativeIndex);
   }
 }
 
 class _RelativeEditPageState extends State<RelativeEditPage> {
+  User _selectedRelative;
+  int selectedRelativeIndex = -1;
+  Repository _repository = null;
+
   final Map<String, dynamic> _formData = {
     'fio': null,
     'phone': null,
@@ -29,6 +37,14 @@ class _RelativeEditPageState extends State<RelativeEditPage> {
   final _fioTextController = TextEditingController();
   final _phoneTextController = TextEditingController();
   final _emailTextController = TextEditingController();
+
+  _RelativeEditPageState(this.selectedRelativeIndex);
+
+  @override
+  initState() {
+    _repository = Repository();
+    super.initState();
+  }
 
   Widget _buildFioTextField(User user) {
     if (user == null && _fioTextController.text.isEmpty) {
@@ -109,14 +125,12 @@ class _RelativeEditPageState extends State<RelativeEditPage> {
   }
 
   _submitForm(Function addRelative, Function updateRelative,
-      Function setSelectedRelative,
-      [int selectedProductIndex]) {
-    if (!_formKey.currentState.validate() ||
-        (_formData['image'] == null && selectedProductIndex == -1)) {
+      Function setSelectedRelative, selectedRelativeIndex) {
+    if (!_formKey.currentState.validate() || selectedRelativeIndex == -1) {
       return;
     }
     _formKey.currentState.save();
-    if (selectedProductIndex == -1) {
+    if (selectedRelativeIndex == -1) {
       addRelative(_fioTextController.text, _phoneTextController.text,
               _emailTextController.text)
           .then((bool success) {
@@ -164,20 +178,16 @@ class _RelativeEditPageState extends State<RelativeEditPage> {
   }
 
   Widget _buildSubmitButton() {
-    return ScopedModelDescendant<MainModel>(
-        builder: (BuildContext context, Widget child, MainModel model) {
-      return model.isLoading
-          ? Center(child: AdaptiveProgressIndicator())
-          : RaisedButton(
-              child: Text('Save'),
-              textColor: Colors.white,
-              onPressed: () => _submitForm(
-                  model.addRelative,
-                  model.updateRelative,
-                  model.selectRelative,
-                  model.selectedRelativeIndex),
-            );
-    });
+    return RaisedButton(
+      child: Text('Save'),
+      textColor: Colors.white,
+      onPressed: () => _submitForm(
+            addRelative,
+            updateRelative,
+            selectRelative,
+            selectedRelativeIndex,
+          ),
+    );
   }
 
   Widget _buildPageContent(BuildContext context, User relative) {
@@ -211,15 +221,20 @@ class _RelativeEditPageState extends State<RelativeEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    return ScopedModelDescendant<MainModel>(
-        builder: (BuildContext context, Widget child, MainModel model) {
-      final Widget pageContent =
-          _buildPageContent(context, model.selectedRelative);
-      return model.selectedRelativeIndex == -1
-          ? pageContent
-          : Scaffold(
-              appBar: AppBar(title: Text("Редактировать контакт")),
-              body: pageContent);
-    });
+    final Widget pageContent = _buildPageContent(context, _selectedRelative);
+    return selectedRelativeIndex == -1
+        ? pageContent
+        : Scaffold(
+            appBar: AppBar(title: Text("Редактировать контакт")),
+            body: pageContent);
+  }
+
+  void addRelative() {}
+
+  void updateRelative() {}
+  void selectRelative() {}
+
+  void setSelectedRelative(User user) {
+    _selectedRelative = user;
   }
 }

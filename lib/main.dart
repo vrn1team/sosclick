@@ -72,14 +72,14 @@ class _SOSClickAppState extends State<SOSClickApp> {
           const Locale('en'), // English
           const Locale('ru'), // Russian
         ],
-        title: 'SOS Click',
+        title: 'SOS Клик',
         theme: getAdaptiveTheme(context),
         routes: {
           '/': (BuildContext context) => !_isRegistered
               ? AuthPage(register)
               : SOSPage(camera: widget.camera, title: 'SOS'),
           '/admin': (BuildContext context) =>
-              !_isRegistered ? AuthPage(register) : RelativesAdminPage(_model)
+              !_isRegistered ? AuthPage(register) : RelativesAdminPage()
         },
         //!! dynamically parsed route
         onGenerateRoute: (RouteSettings settings) {
@@ -109,6 +109,8 @@ class _SOSClickAppState extends State<SOSClickApp> {
     prefs.setString('userPhone', user.phone);
     prefs.setString('userFio', user.fio);
     prefs.setInt('userId', 1);
+
+    this.checkRegistration();
   }
 
   void unregister() async {

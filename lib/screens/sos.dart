@@ -8,6 +8,7 @@ import 'package:camera/camera.dart';
 import 'package:path/path.dart' show join;
 import 'package:path_provider/path_provider.dart';
 import '../screens/DisplayPictureScreen.dart';
+import '../ui_elements/clean_registration_tile.dart';
 
 class SOSPage extends StatefulWidget {
   final String title;
@@ -138,6 +139,28 @@ class _SOSPageState extends State<SOSPage> {
     }
   }
 
+  Widget _buildSideDrawer(BuildContext context) {
+    return Drawer(
+        child: Column(
+      children: <Widget>[
+        AppBar(
+          title: Text('Действия'),
+          elevation:
+              Theme.of(context).platform == TargetPlatform.iOS ? 0.0 : 4.0,
+        ),
+        ListTile(
+          leading: Icon(Icons.edit),
+          title: Text('Контакты'),
+          onTap: () {
+            Navigator.pushReplacementNamed(context, '/admin');
+          },
+        ),
+        Divider(),
+        CleanRegistrationTile(),
+      ],
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -147,6 +170,7 @@ class _SOSPageState extends State<SOSPage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
+      drawer: _buildSideDrawer(context),
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
@@ -171,7 +195,9 @@ class _SOSPageState extends State<SOSPage> {
             Visibility(
               child: Column(
                 children: <Widget>[
-                  Text(_locationInfo),
+                  Center(
+                    child: Text(_locationInfo),
+                  ),
                   SizedBox(
                     height: 8.0,
                   ),
