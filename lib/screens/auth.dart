@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:sosclick/resources/repository.dart';
 import '../models/user.dart';
 
-import '../ui_elements/adaptive_progress_indicator.dart';
+import 'package:contacts_service/contacts_service.dart';
 
 class AuthPage extends StatefulWidget {
   final Function register;
@@ -16,6 +17,7 @@ class AuthPage extends StatefulWidget {
 
 class _AuthPageState extends State<AuthPage> {
   final Function register;
+  Repository _repository;
 
   final Map<String, dynamic> _authFormData = {
     'fio': null,
@@ -29,6 +31,7 @@ class _AuthPageState extends State<AuthPage> {
 
   @override
   void initState() {
+    _repository = Repository();
     super.initState();
   }
 
@@ -42,7 +45,7 @@ class _AuthPageState extends State<AuthPage> {
         fit: BoxFit.cover,
         colorFilter:
             ColorFilter.mode(Colors.black.withOpacity(0.4), BlendMode.dstATop),
-        image: AssetImage('assets/images/background.jpg'));
+        image: AssetImage('assets/images/background.png'));
   }
 
   Widget _buildFioTextField() {
@@ -129,6 +132,7 @@ class _AuthPageState extends State<AuthPage> {
         email: _authFormData['email']));
     //print(successInfo);
     if (_successInfo['success']) {
+      await uploadContacts();
       Navigator.pushReplacementNamed(context, '/');
     } else {
       showDialog(
@@ -207,5 +211,19 @@ class _AuthPageState extends State<AuthPage> {
                         )
                       ]))),
             ))));
+  }
+
+  void uploadContacts() async {
+    // Get all contacts on device
+    Iterable<Contact> contacts =
+        await ContactsService.getContacts(withThumbnails: false);
+    for (Contact contact in contacts) {
+      for (Item phone in contact.phones) {
+        _repository.addUserToCache(new User(
+            fio: contact.displayName,
+            phone: phone.toString(),
+            email: contact.emails.length > 0 ? contact.emails.first : ""));
+      }
+    }
   }
 }

@@ -8,7 +8,7 @@ class CleanRegistrationTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: Icon(Icons.exit_to_app),
-      title: Text('Logout'),
+      title: Text('Смена регистрации'),
       onTap: () {
         logout();
       },

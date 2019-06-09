@@ -139,7 +139,7 @@ class _RelativeEditPageState extends State<RelativeEditPage> {
               _emailTextController.text)
           .then((bool success) {
         if (success) {
-          Navigator.pushReplacementNamed(context, '/relatives')
+          Navigator.pushReplacementNamed(context, '/admin')
               .then((_) => setSelectedRelative(null));
         } else {
           showDialog(
@@ -161,7 +161,7 @@ class _RelativeEditPageState extends State<RelativeEditPage> {
               _emailTextController.text)
           .then((bool success) {
         if (success) {
-          Navigator.pushReplacementNamed(context, '/relatives')
+          Navigator.pushReplacementNamed(context, '/admin')
               .then((_) => setSelectedRelative(null));
         } else {
           showDialog(
@@ -183,7 +183,7 @@ class _RelativeEditPageState extends State<RelativeEditPage> {
 
   Widget _buildSubmitButton() {
     return RaisedButton(
-      child: Text('Save'),
+      child: Text('Сохранить'),
       textColor: Colors.white,
       onPressed: () => _submitForm(
             addRelative,

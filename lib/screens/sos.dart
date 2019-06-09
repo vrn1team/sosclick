@@ -27,13 +27,17 @@ class SOSPage extends StatefulWidget {
 class _SOSPageState extends State<SOSPage> {
   CameraController _controller;
   Future<void> _initializeControllerFuture;
-  int _counter = 0;
+  final int _initialCounter = 2;
+  int _counter = 2;
   bool _visible = false;
   String _locationInfo = '';
+  String _userInfo = '';
 
   @override
   void initState() {
     super.initState();
+    _counter = _initialCounter;
+
     // In order to display the current output from the Camera, you need to
     // create a CameraController.
     _controller = CameraController(
@@ -57,6 +61,8 @@ class _SOSPageState extends State<SOSPage> {
   void _callEmergency() {
     _getUserLocation();
     _takePhoto();
+    _sendSMS();
+
     _visible = true;
   }
 
@@ -67,9 +73,11 @@ class _SOSPageState extends State<SOSPage> {
       // so that the display can reflect the updated values. If we changed
       // _counter without calling setState(), then the build method would not be
       // called again, and so nothing would appear to happen.
-      if (_counter < 3) {
-        _counter++;
+      if (_counter > 0) {
+        _visible = false;
+        _counter--;
       } else {
+        _counter = _initialCounter;
         _callEmergency();
       }
     });
@@ -139,6 +147,16 @@ class _SOSPageState extends State<SOSPage> {
     }
   }
 
+  void _sendSMS() {}
+
+  DecorationImage _buildBackgroundImage() {
+    return DecorationImage(
+        fit: BoxFit.cover,
+        colorFilter:
+            ColorFilter.mode(Colors.black.withOpacity(0.4), BlendMode.dstATop),
+        image: AssetImage('assets/images/background.png'));
+  }
+
   Widget _buildSideDrawer(BuildContext context) {
     return Drawer(
         child: Column(
@@ -176,42 +194,50 @@ class _SOSPageState extends State<SOSPage> {
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Center(
-              child: FlatButton(
-                onPressed: _incrementCounter,
-                child: Icon(Icons.add),
-              ),
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.display1,
-            ),
-            Visibility(
-              child: Column(
-                children: <Widget>[
-                  Center(
-                    child: Text(_locationInfo),
+      body: Container(
+          decoration: BoxDecoration(image: _buildBackgroundImage()),
+          child: Center(
+            // Center is a layout widget. It takes a single child and positions it
+            // in the middle of the parent.
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Center(
+                  child: GestureDetector(
+                    onTap: _incrementCounter,
+                    child: CircleAvatar(
+                      backgroundImage:
+                          ExactAssetImage('assets/images/eButton.png'),
+                      minRadius: 120,
+                      maxRadius: 150,
+                    ),
                   ),
-                  SizedBox(
-                    height: 8.0,
+                ),
+                Text(
+                  '${_counter + 1}',
+                  style: Theme.of(context).textTheme.display1,
+                ),
+                Visibility(
+                  child: Column(
+                    children: <Widget>[
+                      Center(
+                        child: Text(_locationInfo),
+                      ),
+                      SizedBox(
+                        height: 8.0,
+                      ),
+                      Text(
+                        'Помощь идет ...',
+                        style: Theme.of(context).textTheme.display1,
+                      ),
+                      Text(_locationInfo),
+                    ],
                   ),
-                  Text(
-                    'Вызываю спецслужбы ...',
-                    style: Theme.of(context).textTheme.display1,
-                  ),
-                ],
-              ),
-              visible: _visible,
+                  visible: _visible,
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          )),
     );
   }
 }
