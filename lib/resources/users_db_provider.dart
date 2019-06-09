@@ -78,6 +78,22 @@ class UsersDbProvider implements Source, Cache {
     );
   }
 
+  Future<int> updateUser(User user) {
+    return db.insert(
+      "Users",
+      user.toMapForDb(),
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
+  }
+
+  Future<int> deleteUser(User user) {
+    return db.delete(
+      "Users",
+      where: "id = ?",
+      whereArgs: [user.id],
+    );
+  }
+
   Future<int> clearUsers() {
     return db.delete("Users");
   }

@@ -56,6 +56,32 @@ class Repository {
     return users;
   }
 
+  Future<int> addUserToCache(User user) async {
+    int id = -1;
+    for (var cache in caches) {
+      id = await cache.addUser(user);
+      if (id > -1) {
+        break;
+      }
+    }
+    return id;
+  }
+
+  Future<List<User>> deleteUserFromCache(User user) async {
+    int id = -1;
+    for (var cache in caches) {
+      id = await cache.deleteUser(user);
+      if (id > -1) {
+        break;
+      }
+    }
+    if (id > -1) {
+      return fetchUsersFromCache();
+    } else {
+      return [];
+    }
+  }
+
   clearCache() async {
     for (var cache in caches) {
       await cache.clearUsers();
@@ -78,6 +104,8 @@ abstract class Cache {
   Future<CurrentUser> fetchCurrentUser(String hash);
   Future<List<User>> fetchUsers();
   Future<int> addUser(User user);
+  Future<int> deleteUser(User user);
+  Future<int> updateUser(User user);
   Future<int> addCurrentUser(CurrentUser currentuser);
   Future<int> clearUsers();
   Future<int> clearCurrentUsers();

@@ -42,7 +42,7 @@ class _RelativesListPageState extends State<RelativesListPage> {
     return ListView.builder(
       itemBuilder: (BuildContext context, int index) {
         return Dismissible(
-            key: Key(relatives[index].phone),
+            key: Key(relatives[index].id.toString()),
             onDismissed: (DismissDirection direction) {
               if (direction == DismissDirection.endToStart) {
                 selectRelative(relatives[index]);
@@ -57,8 +57,8 @@ class _RelativesListPageState extends State<RelativesListPage> {
             child: Column(
               children: <Widget>[
                 ListTile(
-                    title: Text(relatives[index].fio),
-                    subtitle: Text('\$${relatives[index].phone.toString()}'),
+                    title: Text(relatives[index].fio.toString()),
+                    subtitle: Text(relatives[index].phone.toString()),
                     trailing: _buildEditButton(context, index)),
                 Divider()
               ],
@@ -69,16 +69,24 @@ class _RelativesListPageState extends State<RelativesListPage> {
   }
 
   void fetchRelatives() async {
-    relatives = await Repository().fetchUsersFromCache();
+    List<User> newrelatives = await Repository().fetchUsersFromCache();
+    setState(() {
+      relatives = newrelatives;
+    });
   }
 
   void selectRelative(User user) {
     _selectedRelative = user;
   }
 
-  void deleteSelectedRelative() {
-    relatives =
-        relatives.where((User user) => user != _selectedRelative).toList();
-    _selectedRelative = null;
+  void deleteSelectedRelative() async {
+    if (_selectedRelative == null) {
+      return;
+    }
+    List<User> newrelatives =
+        await Repository().deleteUserFromCache(_selectedRelative);
+    setState(() {
+      relatives = newrelatives;
+    });
   }
 }

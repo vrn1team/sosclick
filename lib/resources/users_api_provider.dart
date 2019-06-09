@@ -47,4 +47,15 @@ class UsersApiProvider implements Source {
     }
     return (json.decode(response.body)).id;
   }
+
+  Future<int> updateUser(User user) async {
+    final http.Response response =
+        await client.put('$_urlRoot/user/', body: user.toJson());
+    print("Response status: ${response.statusCode}");
+    print("Response body: ${response.body}");
+    if (response.statusCode > 299) {
+      return null;
+    }
+    return (json.decode(response.body)).id;
+  }
 }

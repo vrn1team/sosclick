@@ -23,6 +23,7 @@ class _RelativeEditPageState extends State<RelativeEditPage> {
   Repository _repository = null;
 
   final Map<String, dynamic> _formData = {
+    'id': 0,
     'fio': null,
     'phone': null,
     'email': null
@@ -58,16 +59,17 @@ class _RelativeEditPageState extends State<RelativeEditPage> {
           focusNode: _fioFocusNode,
           decoration: InputDecoration(
               labelText: 'ФИО', filled: true, fillColor: Colors.white),
+          controller: _fioTextController,
           keyboardType: TextInputType.text,
-          validator: (String value) {
-            if (value.isEmpty ||
-                !RegExp(r"^[А-ЯЁ][а-яё]{2,}([-][А-ЯЁ][а-яё]{2,})?\s[А-ЯЁ][а-яё]{2,}\s[А-ЯЁ][а-яё]{2,}$")
-                    .hasMatch(value)) {
-              return 'Необходимо ввести Ф.И.О через пробел с большой буквы.';
-            }
-          },
+          // validator: (String value) {
+          //   if (value.isEmpty ||
+          //       !RegExp(r"^[А-ЯЁ][а-яё]{2,}([-][А-ЯЁ][а-яё]{2,})?\s[А-ЯЁ][а-яё]{2,}\s[А-ЯЁ][а-яё]{2,}$")
+          //           .hasMatch(value)) {
+          //     return 'Необходимо ввести Ф.И.О через пробел с большой буквы.';
+          //   }
+          // },
           onSaved: (String value) {
-            _formData['email'] = value;
+            _formData['fio'] = value;
           },
         ));
   }
@@ -84,16 +86,17 @@ class _RelativeEditPageState extends State<RelativeEditPage> {
           focusNode: _phoneFocusNode,
           decoration: InputDecoration(
               labelText: 'Телефон', filled: true, fillColor: Colors.white),
+          controller: _phoneTextController,
           keyboardType: TextInputType.phone,
-          validator: (String value) {
-            if (value.isEmpty ||
-                !RegExp(r"^\+?[78][-\(]?\d{3}\)?-?\d{3}-?\d{2}-?\d{2}$")
-                    .hasMatch(value)) {
-              return 'Необходимо ввести телефон.';
-            }
-          },
+          // validator: (String value) {
+          //   if (value.isEmpty ||
+          //       !RegExp(r"^\+?[78][-\(]?\d{3}\)?-?\d{3}-?\d{2}-?\d{2}$")
+          //           .hasMatch(value)) {
+          //     return 'Необходимо ввести телефон.';
+          //   }
+          // },
           onSaved: (String value) {
-            _formData['email'] = value;
+            _formData['phone'] = value;
           },
         ));
   }
@@ -110,14 +113,15 @@ class _RelativeEditPageState extends State<RelativeEditPage> {
           focusNode: _emailFocusNode,
           decoration: InputDecoration(
               labelText: 'E - Mail', filled: true, fillColor: Colors.white),
+          controller: _emailTextController,
           keyboardType: TextInputType.emailAddress,
-          validator: (String value) {
-            if (value.isEmpty ||
-                !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
-                    .hasMatch(value)) {
-              return 'Необходимо ввести E-mail.';
-            }
-          },
+          // validator: (String value) {
+          //   if (value.isEmpty ||
+          //       !RegExp(r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
+          //           .hasMatch(value)) {
+          //     return 'Необходимо ввести E-mail.';
+          //   }
+          // },
           onSaved: (String value) {
             _formData['email'] = value;
           },
@@ -126,7 +130,7 @@ class _RelativeEditPageState extends State<RelativeEditPage> {
 
   _submitForm(Function addRelative, Function updateRelative,
       Function setSelectedRelative, selectedRelativeIndex) {
-    if (!_formKey.currentState.validate() || selectedRelativeIndex == -1) {
+    if (!_formKey.currentState.validate()) {
       return;
     }
     _formKey.currentState.save();
@@ -229,10 +233,20 @@ class _RelativeEditPageState extends State<RelativeEditPage> {
             body: pageContent);
   }
 
-  void addRelative() {}
+  Future<bool> addRelative(fio, phone, email) async {
+    int id = await _repository
+        .addUserToCache(new User(fio: fio, phone: phone, email: email));
+  }
 
-  void updateRelative() {}
-  void selectRelative() {}
+  Future<bool> updateRelative(fio, phone, email) async {
+    int id = await _repository.addUserToCache(new User(
+        id: _selectedRelative.id, fio: fio, phone: phone, email: email));
+    return (id > -1);
+  }
+
+  void selectRelative() {
+    _repository.fetchUser(_selectedRelative.id);
+  }
 
   void setSelectedRelative(User user) {
     _selectedRelative = user;

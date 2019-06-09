@@ -63,15 +63,15 @@ class _SOSClickAppState extends State<SOSClickApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        localizationsDelegates: [
-          // ... app-specific localization delegate[s] here
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-        ],
-        supportedLocales: [
-          const Locale('en'), // English
-          const Locale('ru'), // Russian
-        ],
+        // localizationsDelegates: [
+        //   // ... app-specific localization delegate[s] here
+        //   GlobalMaterialLocalizations.delegate,
+        //   GlobalWidgetsLocalizations.delegate,
+        // ],
+        // supportedLocales: [
+        //   const Locale('en'), // English
+        //   const Locale('ru'), // Russian
+        // ],
         title: 'SOS Клик',
         theme: getAdaptiveTheme(context),
         routes: {
@@ -91,6 +91,12 @@ class _SOSClickAppState extends State<SOSClickApp> {
           if (pathElements[0] != '') {
             return null;
           }
+
+          if (pathElements[1] == 'relatives') {
+            return MaterialPageRoute(
+                builder: (BuildContext context) => RelativesAdminPage());
+          }
+          return null;
         },
         onUnknownRoute: (RouteSettings settings) {
           // home page !!!

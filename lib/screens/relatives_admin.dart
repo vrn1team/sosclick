@@ -64,7 +64,7 @@ class RelativesAdminPage extends StatelessWidget {
                 body: TabBarView(
                   children: <Widget>[
                     //these pages are embedded!!! return only body!!!
-                    RelativeEditPage(0),
+                    RelativeEditPage(-1),
                     RelativesListPage()
                   ],
                 ))));
